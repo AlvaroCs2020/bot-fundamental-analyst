@@ -6,8 +6,6 @@ from EconomicDataAnalyzer import EconomicDataAnalyzer
 import time
 from datetime import datetime
 
-os.environ["OPENAI_API_KEY"]='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'
-
 def main():
     load_dotenv()
     url: str = os.environ.get("SUPABASE_URL")

@@ -17,7 +17,6 @@ from IPython.display import Markdown, display
 from langchain.schema import AIMessage
 import re
 
-#os.environ["OPENAI_API_KEY"]='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'
 
 class EconomicDataAnalyzer:
     def __init__(self, api_key: str, model_name: str = "gpt-4-turbo", temperature: float = 0.0, use_grok_analysis : bool = False):
