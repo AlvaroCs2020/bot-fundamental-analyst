@@ -49,5 +49,5 @@ debug_python.html
 cookies.txt
 
 # NO ignorar archivos .env (como pediste)
-*.env  # Comentado para permitir que los .env se suban
-# .env.* # Comentado para permitir variaciones como .env.local
+*.env  
+ .env.*

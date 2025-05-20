@@ -16,8 +16,6 @@ from langchain.schema import HumanMessage, SystemMessage
 from IPython.display import Markdown, display
 from langchain.schema import AIMessage
 import re
-
-
 class EconomicDataAnalyzer:
     def __init__(self, api_key: str, model_name: str = "gpt-4-turbo", temperature: float = 0.0, use_grok_analysis : bool = False):
         os.environ["OPENAI_API_KEY"] = api_key
