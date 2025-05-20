@@ -1,0 +1,53 @@
+# Ignorar archivos y directorios generados por el sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignorar directorios de caché y compilación
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.cache/
+*.egg-info/
+build/
+dist/
+
+# Ignorar directorios de dependencias
+node_modules/
+vendor/  # Si no quieres subir las dependencias de PHP (ajusta según tu caso)
+
+# Ignorar logs y archivos temporales
+*.log
+*.tmp
+temp/
+tmp/
+
+# Ignorar archivos de configuración de editores/IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignorar directorios de entornos virtuales de Python
+venv/
+env/
+.virtualenv/
+
+# Ignorar archivos de compilación o binarios
+*.exe
+*.dll
+*.so
+*.o
+*.obj
+
+# Ignorar archivos de depuración generados por el código
+calendar.html
+debug.html
+debug_python.html
+cookies.txt
+
+# NO ignorar archivos .env (como pediste)
+*.env  # Comentado para permitir que los .env se suban
+# .env.* # Comentado para permitir variaciones como .env.local
