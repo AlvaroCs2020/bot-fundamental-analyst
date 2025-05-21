@@ -115,7 +115,7 @@ class GetEconomicCalendar:
         if not isinstance(events, list):
             events = [events]  # in case there's only one event
 
-        filtered = [event for event in events if (event.get('country') in ('USD', 'EUR')) and event.get('previous') is not None ]
+        filtered = [event for event in events if (event.get('country') in (self.currency1, self.currency2)) and event.get('previous') is not None ]
 
         self.data_dict['weeklyevents']['event'] = filtered
 
@@ -145,6 +145,6 @@ class GetEconomicCalendar:
             #self.__save_to_file(self.data_path
 if __name__ == "__main__":
     url = 'https://www.forexfactory.com/calendar'
-    calendar = GetEconomicCalendar(url,"calendar_filtered.json", "EUR", "USD")
+    calendar = GetEconomicCalendar(url,"calendar_filtered.json", "GBP", "USD")
     calendar.get_data()
     print("Filtered calendar saved as calendar_filtered.json")

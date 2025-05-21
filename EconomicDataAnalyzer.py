@@ -1,27 +1,20 @@
 # Import required libraries
 import os  
-from dotenv import load_dotenv  
-from operator import itemgetter
-from langchain_openai import OpenAI
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
-from langchain.schema.runnable import RunnableLambda, RunnablePassthrough
 import json
-from pathlib import Path
-from pprint import pprint
-from langchain_openai import OpenAIEmbeddings
 from datetime import datetime
 from langchain.schema import HumanMessage, SystemMessage
-from IPython.display import Markdown, display
-from langchain.schema import AIMessage
+
 import re
 class EconomicDataAnalyzer:
-    def __init__(self, api_key: str, model_name: str = "gpt-4-turbo", temperature: float = 0.0, use_grok_analysis : bool = False):
+    def __init__(self, api_key: str, model_name: str = "gpt-4-turbo", temperature: float = 0.0, use_grok_analysis : bool = False, currency1 : str = "EUR", currency2 : str = "USD"):
         os.environ["OPENAI_API_KEY"] = api_key
         self.model = ChatOpenAI(temperature=temperature, model_name=model_name)
         self.context = ""
         self.use_grok_analysis = use_grok_analysis
+        self.currency1 = currency1
+        self.currency2 = currency2
     def __save_json(self, path: str, text: str) -> bool:
         # Buscar el bloque JSON
         match = re.search(r'(\{\s*"weeklyevents"\s*:\s*\{[\s\S]+?\}\s*\})', text)
@@ -70,7 +63,8 @@ class EconomicDataAnalyzer:
 
         with open(system_prompt_path, "r", encoding="utf-8") as f_sys:
             system_prompt = f_sys.read()
-
+        system_prompt.replace("USD", self.currency2)
+        system_prompt.replace("EUR", self.currency1)
         self.context = f"""
         System Message:
         {system_prompt}
@@ -92,6 +86,8 @@ class EconomicDataAnalyzer:
         response = self.model.invoke(messages)
         print("[API CALL - DONE]")
         return response.content
+    def get_pair_name(self):
+        return str(self.currency1) + str(self.currency2)
     def get_analysis_result(self):
         system_prompt_path = "systemMessage.txt"
         self.__load_inputs(
