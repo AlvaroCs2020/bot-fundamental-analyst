@@ -5,7 +5,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
-
+from TelegramBot import TelegramBot
 class CalendarUpdatesCheck:
     def __init__(self, list_of_pairs, url):
         self.list_of_pairs = list_of_pairs
@@ -13,6 +13,7 @@ class CalendarUpdatesCheck:
         self.url = str(url)
         self.analysis_required: bool = False
         self.base_path = os.path.dirname(os.path.abspath(__file__))  # Ruta base del script
+        self.pending_notifications = []
 
     def __get_full_calendar_html(self):
         try:
@@ -136,11 +137,13 @@ class CalendarUpdatesCheck:
                     continue
 
                 old = match_old[0]
+
                 if not (str(event.get("forecast")) == str(old.get("forecast")) and
                         str(event.get("previous")) == str(old.get("previous")) and
                         str(event.get("actual")) == str(old.get("actual"))):
                     self.analysis_required = True
-                    print(f"LLEGO UNA UPDATE PARA EL PAR {name_of_pair} {title} {country} actual {event.get('actual')} viejo: {old.get('actual')}")
+                    self.pending_notifications.append((title, country, str(event.get("actual"))))
+                    print(f"Noticia con novedad: {title} {country} actual {event.get('actual')} viejo: {old.get('actual')}")
 
             if self.analysis_required:
                 currencies_that_need_new_analysis.append((currency1, currency2))
@@ -153,6 +156,10 @@ class CalendarUpdatesCheck:
         self.save_events_per_pair_to_json()
         currencies_that_need_new_analysis = self.check_new_events_or_update()
         self.save_events_per_pair_to_json(save_as_old=True)
+        TelegramBot.post(self.pending_notifications)
+        self.pending_notifications.clear()
+        self.pending_notifications = []
+
         return currencies_that_need_new_analysis
 
 def main():
@@ -160,6 +167,3 @@ def main():
     url = "https://www.forexfactory.com/calendar"
     checker = CalendarUpdatesCheck(list_of_pairs, url=url)
     checker.process()
-
-if __name__ == "__main__":
-    main()
