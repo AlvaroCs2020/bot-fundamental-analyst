@@ -1,12 +1,12 @@
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from GetEconomicCalendar import GetEconomicCalendar
 from EconomicDataAnalyzer import EconomicDataAnalyzer
+from CalendarUpdatesCheck import CalendarUpdatesCheck
 import time
 from datetime import datetime
 import sys
-def main(currency1 : str = "EUR", currency2 : str = "USD"):
+def call_analyst_and_save_to_db(currency1 : str = "EUR", currency2 : str = "USD"):
     load_dotenv()
     url: str = os.environ.get("SUPABASE_URL")
     key: str = os.environ.get("SUPABASE_KEY")
@@ -14,13 +14,8 @@ def main(currency1 : str = "EUR", currency2 : str = "USD"):
 
     print("[MAIN - ECONOMIC NEWS ANALYST BOT {}{} ]".format(currency1, currency2))
     #Get the economic calendar
-    url = 'https://www.forexfactory.com/calendar'
     print("[MAIN - EXTRACTING {}/{} NEWS]".format(currency1, currency2))
-    calendar = GetEconomicCalendar(url, "calendar_filtered.json", currency1, currency2)
-    calendar.get_data()
 
-    #Get Grok Analysis maybe twitter
-    ##grokAnalysis.txt generation
 
     #GPT analysis
     analyzer = EconomicDataAnalyzer(api_key=str(os.getenv("OPENAI_API_KEY")), model_name = "gpt-4.1-mini", currency1 = currency1, currency2 = currency2)
@@ -42,32 +37,37 @@ def main(currency1 : str = "EUR", currency2 : str = "USD"):
         .execute()
     )
     print(response)
+def main_loop():
+    list_of_pairs = [("GBP", "USD"), ("EUR", "USD")]
+    url = "https://www.forexfactory.com/calendar"
+    calendar_updates_checker = CalendarUpdatesCheck(list_of_pairs, url=url)
+    a = calendar_updates_checker.process() #Traemos todas las noticias y creamos los json
 
+    for (currency1, currency2) in a: #Creamos todos los analisis y cargamos la db
+        call_analyst_and_save_to_db(currency1, currency2)
 
-def mostrar_progreso(valor):
-    print(f"\rProgreso: {valor}%", end='', flush=True)
-def loop():
-    #main("EUR", "USD")
-    #main("GBP", "USD")
     while True:
         now = datetime.now()
-        if now.minute == 0 or now.minute == 30:
-            print("¡Son las 10 PM!")
-            # Aquí podés hacer lo que quieras que pase a las 10 PM
-            main("EUR", "USD")
-            main("GBP", "USD")
+        if now.minute % 5 == 0: #cada 10 min reviso investing y comparo contra las ultimas noticias que me traje
+
+            print("pasaron 10min, revisamos el calendario")
+            currencies_to_analyze = []
+            currencies_to_analyze = calendar_updates_checker.process()
+            for (currency1, currency2) in currencies_to_analyze: ##Multiple threading
+                call_analyst_and_save_to_db(currency1, currency2)
             # Esperar 60 segundos para no imprimir múltiples veces
             time.sleep(60)
         else:
             # Dormir 10 segundos para no sobrecargar la CPU
             print(f"\rHora del bot: {str(now.hour)} : {str(now.minute)} : {str(now.second)}", end='', flush=True)
 
-            time.sleep(10)
+            time.sleep(1)
+
         sys.stdout.flush()
+
 if __name__ == "__main__":
-    loop()
-    #main("EUR","USD")
-    #main("GBP","USD")
+    main_loop()
+
 
 
 

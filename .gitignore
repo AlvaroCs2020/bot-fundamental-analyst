@@ -51,3 +51,15 @@ cookies.txt
 # NO ignorar archivos .env (como pediste)
 *.env  
  .env.*
+
+build/
+dist/
+
+*.exe
+
+
+*.spec
+
+AnalysisResult.txt
+
+*.json

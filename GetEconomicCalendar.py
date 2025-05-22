@@ -15,7 +15,7 @@ class GetEconomicCalendar:
         self.events = []
         self.currency1 = currency1
         self.currency2 = currency2
-    def __fetch_html(self):
+    def fetch_html(self):
         try:
             # Configurar opciones de Chrome
             options = Options()
@@ -39,7 +39,7 @@ class GetEconomicCalendar:
             driver.quit()
 
             # Guardar el HTML para depuración
-            with open("calendar.html", "w", encoding="utf-8") as f:
+            with open("./data/calendar.html", "w", encoding="utf-8") as f:
                 f.write(html)
             print("HTML guardado en calendar.html")
 
@@ -51,7 +51,7 @@ class GetEconomicCalendar:
             print(f"Error al obtener el HTML: {e}")
             return None
 
-    def __extract_events_from_html(self):
+    def extract_events_from_html(self):
 
         with open("calendar.html", "r", encoding="utf-8") as f:
             html = f.read()
@@ -89,26 +89,23 @@ class GetEconomicCalendar:
         self.data_dict['weeklyevents']['event'] = events
         return self.events
 
-    def __generate_json(self, events):
+    def generate_json(self, events):
         result = {"weeklyevents": {"event": events}}
         return json.dumps(result, indent=2)
 
-    def __fetch_xml(self):
+    def fetch_xml(self):
         response = requests.get(self.url)
         response.raise_for_status()
         self.raw_xml = response.content
 
-    def __parse_xml(self):
+    def parse_xml(self):
         if self.raw_xml is None:
             raise ValueError("No XML content fetched. Call fetch_xml() first.")
         self.data_dict = xmltodict.parse(self.raw_xml)
 
-    def __filter_events(self, exclude_countries=None):
+    def filter_events(self, exclude_countries=None):
         if self.data_dict is None:
             raise ValueError("No parsed XML data. Call parse_xml() first.")
-
-        if exclude_countries is None:
-            exclude_countries = []
 
         events = self.data_dict.get("weeklyevents",{}).get("event",{})
 
@@ -121,23 +118,23 @@ class GetEconomicCalendar:
 
         return self.data_dict
 
-    def __to_json(self, indent=2):
+    def to_json(self, indent=2):
         if self.data_dict is None:
             raise ValueError("No parsed data to convert. Call parse_xml() first.")
         return json.dumps(self.data_dict, indent=indent)
 
-    def __save_to_file(self, filepath, json_data):
+    def save_to_file(self, filepath, json_data):
         print("Luego del filtrado por divisa, se analizaran: "+ str(len(self.data_dict['weeklyevents']['event'])) + " noticias ")
 
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(json_data)
 
     def get_data(self):
-        self.__fetch_html()
-        events = self.__extract_events_from_html()
-        json_data = self.__filter_events()
-        json_data = self.__generate_json(json_data.get("weeklyevents").get("event"))
-        self.__save_to_file(self.data_path, json_data)
+        self.fetch_html()
+        events = self.extract_events_from_html()
+        json_data = self.filter_events()
+        json_data = self.generate_json(json_data.get("weeklyevents").get("event"))
+        self.save_to_file(self.data_path, json_data)
 
 
 
