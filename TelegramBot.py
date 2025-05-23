@@ -30,7 +30,8 @@ class TelegramBot:
         url = f"https://api.telegram.org/bot{TelegramBot.TOKEN}/sendMessage"
         payload = {
             "chat_id": TelegramBot.CHAT_ID,
-            "text": message
+            "text": message,
+            "parse_mode": "Markdown"  # <-- mensajes mas lindos
         }
 
         try:
@@ -44,6 +45,45 @@ class TelegramBot:
         except Exception as e:
             print(f"Error sending message: {e}")
             return False
+
+    @staticmethod
+    def notify_analysis_result(result):
+        print("[TELEGRAM BOT - SE NOTIFICARA EL RESULTADO DEL ULTIMO ANALISIS]")
+
+        sentiment_map = {
+            1:  "📈 Bullish",
+            -1: "📉 Bearish",
+            0:  "🔷 Neutral"
+        }
+        currency2 = result[0][0]
+        currency1 = result[1][0]
+        pair_name = result[2][0]
+        prediction_currency2, coef_currency2 = result[0][1]  # CURRENCY 2
+        prediction_currency1, coef_currency1 = result[1][1]  # CURRENCY 1
+        prediction_currency_pair, coef_currency_pair = result[2][1]  ##CURRENCY1CURRENCY2
+        text = f"""
+📊 *Nuevo Análisis Disponible*
+
+🔍 *Par analizado:* `{pair_name}`
+
+━━━━━━━━━━━━━━━━━━━━
+💱 *{currency1}*
+Sentimiento: *{sentiment_map[prediction_currency1]}*
+Confianza: *{int(float(coef_currency1)*100)}%*
+━━━━━━━━━━━━━━━━━━━━
+💱 *{currency2}*
+Sentimiento: *{sentiment_map[prediction_currency2]}*
+Confianza: *{int(float(coef_currency2)*100)}%*
+━━━━━━━━━━━━━━━━━━━━
+🔗 *Par {pair_name}*
+Sentimiento: *{sentiment_map[prediction_currency_pair]}*
+Confianza: *{int(float(coef_currency_pair)*100)}%*
+━━━━━━━━━━━━━━━━━━━━
+
+🧠 _Este análisis fue generado automáticamente por el sistema de predicción de abby!!._
+"""
+        TelegramBot.send_message(text)
+
     @staticmethod
     def post(events):
         print("[TELEGRAM BOT - SE ENVIARAN SIN FILTRAR]")
@@ -51,6 +91,15 @@ class TelegramBot:
         unique_events = TelegramBot.remove_duplicates(events)
         print("[TELEGRAM BOT - FILTRADO]")
         print(unique_events)
+
         for (title, country, actual) in unique_events:
-            text = f"Llego una novedad de {country}, {title}. Nuevo actual: {actual}"
+            text = f"""
+    📢 *Nuevo Evento Económico Detectado*
+
+    🌍 *País:* `{country}`
+    📌 *Evento:* _{title}_
+    📈 *Valor actual:* *{actual}*
+
+    🧠 _Notificación enviada automáticamente por el sistema._
+    """
             TelegramBot.send_message(text)

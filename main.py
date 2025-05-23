@@ -3,6 +3,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from EconomicDataAnalyzer import EconomicDataAnalyzer
 from CalendarUpdatesCheck import CalendarUpdatesCheck
+from TelegramBot import TelegramBot
 import time
 from datetime import datetime
 import sys
@@ -26,6 +27,10 @@ def call_analyst_and_save_to_db(currency1 : str = "EUR", currency2 : str = "USD"
     else:
         print("[MAIN - INCORRECT OUTPUT]")
         return
+    #Inform results by telegram
+
+    TelegramBot.notify_analysis_result(output)
+
     # Save results
     prediction_currency2, coef_currency2 = output[0][1] #CURRENCY 2
     prediction_currency1, coef_currency1 = output[1][1] #CURRENCY 1
