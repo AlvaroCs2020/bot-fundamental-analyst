@@ -74,7 +74,7 @@ class CalendarUpdatesCheck:
             except json.JSONDecodeError:
                 continue
 
-        print(f"[ CALENDAR UPDATE CHECKER - Se obtuvieron: {len(events)} noticias ]")
+        print(f"[CALENDAR UPDATE CHECKER - Se obtuvieron: {len(events)} noticias ]")
         self.data_dict['weeklyevents']['event'] = events
         return self.data_dict
 
@@ -93,7 +93,7 @@ class CalendarUpdatesCheck:
 
             file_new = os.path.join(self.base_path, "data", f"filtered_events_{name_of_pair}.json")
             file_old = os.path.join(self.base_path, "data", f"filtered_events_{name_of_pair}_old.json")
-
+            print(file_new)
             if save_as_old:
                 with open(file_old, "w", encoding="utf-8") as f:
                     f.write(data_json)
@@ -134,6 +134,7 @@ class CalendarUpdatesCheck:
 
                 if not match_old:
                     self.analysis_required = True
+                    self.pending_notifications.append((title, country, "Se agrego esta noticia"))
                     continue
 
                 old = match_old[0]
@@ -155,6 +156,7 @@ class CalendarUpdatesCheck:
         self.__extract_all_events_from_html()
         self.save_events_per_pair_to_json()
         currencies_that_need_new_analysis = self.check_new_events_or_update()
+        print(f"[CALENDAR UPDATE CHECKER - found {currencies_that_need_new_analysis}]")
         self.save_events_per_pair_to_json(save_as_old=True)
         TelegramBot.post(self.pending_notifications)
         self.pending_notifications.clear()

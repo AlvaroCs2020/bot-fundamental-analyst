@@ -1,11 +1,12 @@
-pip install tweepy
-pip install langchain
-pip install -U langchain-openai
-pip install langchain-community langchain-core
-pip install xmltodict
-pip install psycopg2
-pip install supabase
-pip install selenium
-pip install httpx[http2]
-
-pip install twilio
+tweepy
+langchain
+langchain-openai>=0.1.0
+langchain-community
+langchain-core
+xmltodict
+psycopg2-binary
+supabase
+selenium
+httpx[http2]
+python-dotenv
+bs4

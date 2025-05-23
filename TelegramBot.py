@@ -46,7 +46,11 @@ class TelegramBot:
             return False
     @staticmethod
     def post(events):
+        print("[TELEGRAM BOT - SE ENVIARAN SIN FILTRAR]")
+        print(events)
         unique_events = TelegramBot.remove_duplicates(events)
+        print("[TELEGRAM BOT - FILTRADO]")
+        print(unique_events)
         for (title, country, actual) in unique_events:
             text = f"Llego una novedad de {country}, {title}. Nuevo actual: {actual}"
             TelegramBot.send_message(text)

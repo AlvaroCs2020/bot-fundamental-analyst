@@ -18,12 +18,13 @@ def call_analyst_and_save_to_db(currency1 : str = "EUR", currency2 : str = "USD"
 
 
     #GPT analysis
-    analyzer = EconomicDataAnalyzer(api_key=str(os.getenv("OPENAI_API_KEY")), model_name = "gpt-4.1-mini", currency1 = currency1, currency2 = currency2)
+    analyzer = EconomicDataAnalyzer(api_key=str(os.getenv("OPENAI_API_KEY")), model_name = "gpt-4.1", currency1 = currency1, currency2 = currency2)
     # [('USD', (1, 0.65)), ('EUR', (0, 0.55)), ('EURUSD', (-1, 0.6))] ejemplo
     output = analyzer.get_analysis_result()
     if output is not []:
-        print("[CORRECT OUTPUT]")
+        print("[MAIN - CORRECT OUTPUT]")
     else:
+        print("[MAIN - INCORRECT OUTPUT]")
         return
     # Save results
     prediction_currency2, coef_currency2 = output[0][1] #CURRENCY 2
@@ -48,18 +49,18 @@ def main_loop():
 
     while True:
         now = datetime.now()
-        if now.minute % 5 == 0: #cada 10 min reviso investing y comparo contra las ultimas noticias que me traje
-
-            print("pasaron 10min, revisamos el calendario")
+        if now.minute % 5 == 0: #cada 5 min reviso investing y comparo contra las ultimas noticias que me traje
+            print("[MAIN - check news]")
             currencies_to_analyze = []
             currencies_to_analyze = calendar_updates_checker.process()
+
             for (currency1, currency2) in currencies_to_analyze: ##Multiple threading
                 call_analyst_and_save_to_db(currency1, currency2)
-            # Esperar 60 segundos para no imprimir múltiples veces
-            time.sleep(60)
+
+            time.sleep(30)
         else:
             # Dormir 10 segundos para no sobrecargar la CPU
-            print(f"\rHora del bot: {str(now.hour)} : {str(now.minute)} : {str(now.second)}", end='', flush=True)
+            print(f"\r[MAIN - Hora del bot: {str(now.hour)} : {str(now.minute)} : {str(now.second)}]", end='', flush=True)
 
             time.sleep(1)
 

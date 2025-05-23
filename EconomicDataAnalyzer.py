@@ -86,7 +86,7 @@ class EconomicDataAnalyzer:
 
         system_prompt_path = os.path.join(self.base_path, "data", "systemMessage.txt")
         json_path = os.path.join(self.base_path, "data", f"filtered_events_{name_of_pair}.json")
-        result_path = os.path.join(self.base_path, "data", "AnalysisResult.txt")
+        result_path = os.path.join(self.base_path, "data", f"AnalysisResult{name_of_pair}.txt")
 
         self.__load_inputs(
             json_path=json_path,

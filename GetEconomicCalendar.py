@@ -112,7 +112,7 @@ class GetEconomicCalendar:
         if not isinstance(events, list):
             events = [events]  # in case there's only one event
 
-        filtered = [event for event in events if (event.get('country') in (self.currency1, self.currency2)) and event.get('previous') is not None ]
+        filtered = [event for event in events if (event.get('country') in (self.currency1, self.currency2))]
 
         self.data_dict['weeklyevents']['event'] = filtered
 
